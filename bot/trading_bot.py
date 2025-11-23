@@ -25,6 +25,7 @@ from bot.order_manager import OrderManager
 from notifications.telegram_notifier import TelegramNotifier
 from core.volume_analyzer import VolumeAnalyzer
 from dashboard.server import DashboardServer
+from database.db_manager import DatabaseManager
 from config.config import Config
 
 
@@ -47,6 +48,10 @@ class TradingBot:
             self.order_manager = OrderManager(self.exchange)
             self.risk_manager = RiskManager()
             self.position_manager = PositionManager()
+            
+            # Initialize Database Manager
+            self.db = DatabaseManager()
+            self.logger.info("Database manager initialized")
             
             # Initialize Telegram notifier
             self.telegram = TelegramNotifier()
@@ -242,6 +247,29 @@ class TradingBot:
             
             # Check positions
             positions_to_close = self.position_manager.update_positions(current_prices)
+            
+            # Update position snapshots in database
+            for symbol, position in self.position_manager.positions.items():
+                try:
+                    current_price = current_prices.get(symbol, position.current_price)
+                    position_data = {
+                        'position_id': f"pos_{symbol}_{int(position.entry_time.timestamp())}",
+                        'symbol': symbol,
+                        'strategy': getattr(position, 'strategy', 'UNKNOWN'),
+                        'side': 'LONG' if position.side == 'buy' else 'SHORT',
+                        'entry_price': position.entry_price,
+                        'current_price': current_price,
+                        'amount': position.amount,
+                        'entry_time': position.entry_time.isoformat(),
+                        'stop_loss': position.stop_loss,
+                        'take_profit': position.take_profit,
+                        'unrealized_pnl': position.unrealized_pnl,
+                        'pnl_percent': position.pnl_percent,
+                        'status': 'OPEN'
+                    }
+                    self.db.upsert_position(position_data)
+                except Exception as db_err:
+                    self.logger.error(f"Failed to update position snapshot for {symbol}: {db_err}")
             
             # Close positions that hit SL/TP
             for symbol, reason in positions_to_close:
@@ -524,6 +552,28 @@ class TradingBot:
                         duration_str = f"{int(hours)}h {int((hours % 1) * 60)}m"
                     else:
                         duration_str = None
+                    
+                    # Save trade to database
+                    try:
+                        trade_data = {
+                            'trade_id': f"trade_{symbol}_{int(closed_position.entry_time.timestamp())}",
+                            'timestamp': closed_position.exit_time.isoformat() if closed_position.exit_time else datetime.now().isoformat(),
+                            'symbol': symbol,
+                            'strategy': getattr(closed_position, 'strategy', 'UNKNOWN'),
+                            'side': 'LONG' if closed_position.side == 'buy' else 'SHORT',
+                            'entry_price': closed_position.entry_price,
+                            'exit_price': closed_position.exit_price,
+                            'entry_time': closed_position.entry_time.isoformat(),
+                            'exit_time': closed_position.exit_time.isoformat() if closed_position.exit_time else datetime.now().isoformat(),
+                            'amount': closed_position.amount,
+                            'pnl': closed_position.pnl,
+                            'pnl_percent': closed_position.pnl_percent,
+                            'exit_reason': reason
+                        }
+                        self.db.insert_trade(trade_data)
+                        self.logger.info(f"Trade saved to database for {symbol}")
+                    except Exception as db_err:
+                        self.logger.error(f"Failed to save trade to database: {db_err}")
                     
                     # Send position closed notification
                     self.telegram.send_position_closed(
