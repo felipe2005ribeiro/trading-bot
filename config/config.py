@@ -121,18 +121,6 @@ class Config:
     ENABLE_TRAILING_STOP = os.getenv('ENABLE_TRAILING_STOP', 'false').lower() == 'true'
     TRAILING_ACTIVATION_PERCENT = float(os.getenv('TRAILING_ACTIVATION_PERCENT', '1.5'))
     TRAILING_DISTANCE_PERCENT = float(os.getenv('TRAILING_DISTANCE_PERCENT', '0.8'))
-    
-    # Disabled - no symbols use trailing stops based on real data
-    TRAILING_SYMBOLS = []  # Empty list
-    
-    # ===================================
-    # TELEGRAM NOTIFICATIONS
-    }
-    
-    # Fallback strategy for symbols not in mapping
-    DEFAULT_STRATEGY = STRATEGY
-    
-    # ===================================
     # MULTI-TIMEFRAME (MTF) ANALYSIS
     # ===================================
     # Filter trades based on higher timeframe trend
