@@ -32,7 +32,16 @@ class DashboardServer:
             bot_instance: Reference to TradingBot instance (optional)
         """
         self.bot = bot_instance
-        self.app = Flask(__name__)
+        
+        # Get absolute path to dashboard directory
+        dashboard_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Initialize Flask with explicit template and static folders
+        self.app = Flask(
+            __name__,
+            template_folder=os.path.join(dashboard_dir, 'templates'),
+            static_folder=os.path.join(dashboard_dir, 'static')
+        )
         CORS(self.app)
         
         # Silence Flask development server logging
