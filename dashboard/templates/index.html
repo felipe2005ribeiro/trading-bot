@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Trading Bot Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <h1>🤖 Trading Bot Dashboard</h1>
+                <div class="status-badge" id="bot-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Loading...</span>
+                </div>
+            </div>
+            <div class="last-update">
+                Last updated: <span id="last-update-time">Never</span>
+            </div>
+        </header>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">💰</div>
+                <div class="metric-content">
+                    <h3>Capital</h3>
+                    <p class="metric-value" id="capital">$0.00</p>
+                    <span class="metric-sub">Initial: <span id="initial-capital">$0.00</span></span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">📈</div>
+                <div class="metric-content">
+                    <h3>Total Return</h3>
+                    <p class="metric-value" id="total-return">+0.00%</p>
+                    <span class="metric-sub">Since start</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">🎯</div>
+                <div class="metric-content">
+                    <h3>Win Rate</h3>
+                    <p class="metric-value" id="win-rate">0%</p>
+                    <span class="metric-sub" id="trades-count">0 trades</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">💎</div>
+                <div class="metric-content">
+                    <h3>Profit Factor</h3>
+                    <p class="metric-value" id="profit-factor">0.00</p>
+                    <span class="metric-sub">Risk/reward</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">🔴</div>
+                <div class="metric-content">
+                    <h3>Max Drawdown</h3>
+                    <p class="metric-value danger" id="max-drawdown">0.00%</p>
+                    <span class="metric-sub">Peak to trough</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">📌</div>
+                <div class="metric-content">
+                    <h3>Open Positions</h3>
+                    <p class="metric-value" id="open-positions">0</p>
+                    <span class="metric-sub">Active trades</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equity Curve Chart -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2>📊 Equity Curve</h2>
+                <div class="chart-controls">
+                    <button class="btn-small" id="refresh-chart">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="equityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Open Positions -->
+        <div class="positions-section" id="positions-section">
+            <div class="section-header">
+                <h2>🎯 Open Positions</h2>
+                <span class="badge" id="positions-badge">0</span>
+            </div>
+            <div id="positions-list" class="positions-list">
+                <p class="no-data">No open positions</p>
+            </div>
+        </div>
+
+        <!-- Recent Trades -->
+        <div class="trades-section">
+            <div class="section-header">
+                <h2>📋 Recent Trades</h2>
+                <div class="trade-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="wins">Wins</button>
+                    <button class="filter-btn" data-filter="losses">Losses</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Symbol</th>
+                            <th>Strategy</th>
+                            <th>Side</th>
+                            <th>Entry</th>
+                            <th>Exit</th>
+                            <th>PnL</th>
+                            <th>%</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trades-body">
+                        <tr>
+                            <td colspan="9" class="no-data">No trades yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Trading Bot Dashboard v1.0 | Auto-refresh every 5s</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

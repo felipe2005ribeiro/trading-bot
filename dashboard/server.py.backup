@@ -1,0 +1,271 @@
+"""
+Flask server for trading bot dashboard.
+Provides REST API endpoints and serves the web interface.
+"""
+
+from flask import Flask, jsonify, render_template, Response, request
+from flask_cors import CORS
+from datetime import datetime
+import json
+import time
+from typing import Dict, List
+import os
+import sys
+
+# Add parent directory to path to import bot modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from config.config import Config
+from core.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+class DashboardServer:
+    """Dashboard server for trading bot monitoring."""
+    
+    def __init__(self, bot_instance=None):
+        """
+        Initialize dashboard server.
+        
+        Args:
+            bot_instance: Reference to TradingBot instance (optional)
+        """
+        self.bot = bot_instance
+        self.app = Flask(__name__)
+        CORS(self.app)
+        
+        # Mock data for development (will be replaced with real bot data)
+        self.mock_data = {
+            'capital': 10000.0,
+            'initial_capital': 10000.0,
+            'total_trades': 0,
+            'winning_trades': 0,
+            'losing_trades': 0,
+            'open_positions': [],
+            'trade_history': [],
+            'equity_curve': []
+        }
+        
+        # Equity curve tracking for charts
+        self.equity_history = []  # List of (timestamp, capital) tuples
+        self.last_equity_update = None
+        
+        self._setup_routes()
+        logger.info("Dashboard server initialized")
+    
+    def _setup_routes(self):
+        """Setup Flask routes."""
+        
+        @self.app.route('/')
+        def index():
+            """Serve main dashboard page."""
+            return render_template('index.html')
+        
+        @self.app.route('/api/metrics')
+        def get_metrics():
+            """Get current bot metrics."""
+            try:
+                metrics = self._get_metrics()
+                return jsonify(metrics)
+            except Exception as e:
+                logger.error(f"Error getting metrics: {e}")
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/trades')
+        def get_trades():
+            """Get trade history."""
+            try:
+                limit = int(request.args.get('limit', 20))
+                trades = self._get_trades(limit)
+                return jsonify(trades)
+            except Exception as e:
+                logger.error(f"Error getting trades: {e}")
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/positions')
+        def get_positions():
+            """Get open positions."""
+            try:
+                positions = self._get_positions()
+                return jsonify(positions)
+            except Exception as e:
+                logger.error(f"Error getting positions: {e}")
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/equity')
+        def get_equity():
+            """Get equity curve data."""
+            try:
+                equity_data = self._get_equity_curve()
+                return jsonify(equity_data)
+            except Exception as e:
+                logger.error(f"Error getting equity data: {e}")
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/strategy_performance')
+        def get_strategy_performance():
+            """Get performance metrics by strategy."""
+            try:
+                performance = self._get_strategy_performance()
+                return jsonify(performance)
+            except Exception as e:
+                logger.error(f"Error getting strategy performance: {e}")
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/stream')
+        def stream():
+            """Server-Sent Events stream for real-time updates."""
+            def event_stream():
+                while True:
+                    metrics = self._get_metrics()
+                    yield f"data: {json.dumps(metrics)}\n\n"
+                    time.sleep(5)  # Update every 5 seconds
+            
+            return Response(event_stream(), mimetype='text/event-stream')
+    
+    def _get_metrics(self) -> Dict:
+        """Get current bot metrics."""
+        if self.bot and hasattr(self.bot, 'risk_manager'):
+            rm = self.bot.risk_manager
+            pm = self.bot.position_manager
+            
+            total_return = ((rm.current_capital - rm.initial_capital) / rm.initial_capital) * 100
+            win_rate = (rm.winning_trades / rm.total_trades * 100) if rm.total_trades > 0 else 0
+            
+            # Calculate profit factor from closed positions
+            gross_profit = 0
+            gross_loss = 0
+            if hasattr(pm, 'closed_positions'):
+                for _, pos in pm.closed_positions.items():
+                    pnl = pos.get('pnl', 0)
+                    if pnl > 0:
+                        gross_profit += pnl
+                    else:
+                        gross_loss += abs(pnl)
+            
+            profit_factor = gross_profit / gross_loss if gross_loss > 0 else 0
+            
+            return {
+                'capital': rm.current_capital,
+                'initial_capital': rm.initial_capital,
+                'total_return': total_return,
+                'total_trades': rm.total_trades,
+                'win_rate': win_rate,
+                'profit_factor': profit_factor,
+                'max_drawdown': rm.get_current_drawdown(),
+                'open_positions': len(pm.positions),
+               'status': 'running' if self.bot.running else 'stopped',
+                'timestamp': datetime.now().isoformat()
+            }
+        else:
+            # Return mock data for development
+            return {
+                'capital': self.mock_data['capital'],
+                'initial_capital': self.mock_data['initial_capital'],
+                'total_return': 0.0,
+                'total_trades': self.mock_data['total_trades'],
+                'win_rate': 0.0,
+                'profit_factor': 0.0,
+                'max_drawdown': 0.0,
+                'open_positions': len(self.mock_data['open_positions']),
+                'status': 'development',
+                # Calculate unrealized PnL
+                if side == 'buy':
+                    unrealized_pnl = (current_price - entry_price) * amount
+                else:
+                    unrealized_pnl = (entry_price - current_price) * amount
+                
+                # Calculate duration
+                entry_time = position.get('entry_time', datetime.now())
+                duration_minutes = (datetime.now() - entry_time).total_seconds() / 60
+                
+                positions.append({
+                    'symbol': symbol,
+                    'side': side,
+                    'entry_price': entry_price,
+                    'current_price': current_price,
+                    'amount': amount,
+                    'unrealized_pnl': unrealized_pnl,
+                    'stop_loss': position.get('stop_loss', 0),
+                    'take_profit': position.get('take_profit', 0),
+                    'duration_minutes': int(duration_minutes)
+                })
+            return positions
+        else:
+            return self.mock_data['open_positions']
+    
+    def _get_equity_curve(self) -> Dict:
+        """Get equity curve data."""
+        if self.bot and hasattr(self.bot, 'risk_manager'):
+            current_time = datetime.now()
+            current_capital = self.bot.risk_manager.current_capital
+            
+            # Update equity history every 60 seconds
+            if (self.last_equity_update is None or 
+                (current_time - self.last_equity_update).total_seconds() >= 60):
+                self.equity_history.append((current_time, current_capital))
+                self.last_equity_update = current_time
+                
+                # Keep only last 1000 data points to avoid memory issues
+                if len(self.equity_history) > 1000:
+                    self.equity_history = self.equity_history[-1000:]
+            
+            # Return all historical data
+            if self.equity_history:
+                return {
+                    'timestamps': [t.isoformat() for t, _ in self.equity_history],
+                    'values': [c for _, c in self.equity_history]
+                }
+            else:
+                # If no history yet, return current value
+                return {
+                    'timestamps': [current_time.isoformat()],
+                    'values': [current_capital]
+                }
+        else:
+            return {
+                'timestamps': [],
+                'values': []
+            }
+    
+    def _get_strategy_performance(self) -> List[Dict]:
+        """Get performance by strategy."""
+        # TODO: Track trades by strategy
+        strategies = ['SMA_CROSS', 'RSI_BB', 'EMA_SCALP']
+        performance = []
+        
+        for strategy in strategies:
+            performance.append({
+                'name': strategy,
+                'trades': 0,
+                'win_rate': 0.0,
+                'pnl': 0.0
+            })
+        
+        return performance
+    
+    def run(self, host='0.0.0.0', port=5000, debug=False):
+        """Run the Flask server."""
+        logger.info(f"Starting dashboard server on http://{host}:{port}")
+        self.app.run(host=host, port=port, debug=debug, threaded=True)
+
+
+def create_app(bot_instance=None):
+    """
+    Create and configure Flask app.
+    
+    Args:
+        bot_instance: Optional TradingBot instance
+    
+    Returns:
+        Flask app instance
+    """
+    server = DashboardServer(bot_instance)
+    return server.app
+
+
+if __name__ == '__main__':
+    # For standalone testing
+    server = DashboardServer()
+    server.run(debug=True)
