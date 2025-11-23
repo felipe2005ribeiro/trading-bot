@@ -85,24 +85,6 @@ class Config:
     
     
     # ===================================
-    # BACKTESTING CONFIGURATION
-    # ===================================
-    COMMISSION_RATE = float(os.getenv('COMMISSION_RATE', '0.1'))
-    SLIPPAGE_RATE = float(os.getenv('SLIPPAGE_RATE', '0.05'))
-    
-    # ===================================
-    # LOGGING
-    # ===================================
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
-    LOG_TO_FILE = os.getenv('LOG_TO_FILE', 'true').lower() == 'true'
-    LOG_TO_CONSOLE = os.getenv('LOG_TO_CONSOLE', 'true').lower() == 'true'
-    
-    # ===================================
-    # SCALPING CONFIGURATION
-    # ===================================
-    ENABLE_SCALPING = os.getenv('ENABLE_SCALPING', 'false').lower() == 'true'
-    SCALPING_TIMEFRAMES = os.getenv('SCALPING_TIMEFRAMES', '5m,15m').split(',')
-    SCALP_STOP_LOSS_PERCENT = float(os.getenv('SCALP_STOP_LOSS_PERCENT', '0.6'))
     SCALP_TAKE_PROFIT_PERCENT = float(os.getenv('SCALP_TAKE_PROFIT_PERCENT', '1.0'))
     
     # EMA Scalping
@@ -121,6 +103,34 @@ class Config:
     ENABLE_TRAILING_STOP = os.getenv('ENABLE_TRAILING_STOP', 'false').lower() == 'true'
     TRAILING_ACTIVATION_PERCENT = float(os.getenv('TRAILING_ACTIVATION_PERCENT', '1.5'))
     TRAILING_DISTANCE_PERCENT = float(os.getenv('TRAILING_DISTANCE_PERCENT', '0.8'))
+    
+    # Disabled - no symbols use trailing stops based on real data
+    TRAILING_SYMBOLS = []  # Empty list
+    
+    # ===================================
+    # TELEGRAM NOTIFICATIONS
+    # ===================================
+    TELEGRAM_ENABLED = os.getenv('TELEGRAM_ENABLED', 'false').lower() == 'true'
+    TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+    TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', '')
+    
+    # ===================================
+    # SYMBOL-SPECIFIC STRATEGY CONFIGURATION
+    # ===================================
+    # Each symbol uses its optimal strategy based on 180-day REAL data analysis (production)
+    # BTC: SMA_CROSS (+4.20%), ETH: EMA_SCALP (+10.58%), SOL: EMA_SCALP (+3.59%)
+    # NOTE: Previous testnet data (18 days) gave incorrect results - this is validated
+    # ONLY validated symbols included - BNB/ADA/DOT removed until validated
+    SYMBOL_STRATEGIES = {
+        'BTCUSDT': 'SMA_CROSS',   # Real data validated: +4.20% vs EMA_SCALP +1.07%
+        'ETHUSDT': 'EMA_SCALP',   # Real data validated: +10.58% vs RSI_BB -33.60%
+        'SOLUSDT': 'EMA_SCALP',   # Real data validated: +3.59% vs others negative
+    }
+    
+    # Fallback strategy for symbols not in mapping
+    DEFAULT_STRATEGY = STRATEGY
+    
+    # ===================================
     # MULTI-TIMEFRAME (MTF) ANALYSIS
     # ===================================
     # Filter trades based on higher timeframe trend
