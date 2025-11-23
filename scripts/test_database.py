@@ -2,6 +2,12 @@
 Simple test script to verify database functionality.
 """
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from database.db_manager import DatabaseManager
 from datetime import datetime
 
