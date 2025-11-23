@@ -1,3 +1,30 @@
+"""
+Configuration module for the trading bot.
+Loads all settings from environment variables.
+"""
+
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from typing import List
+
+# Load environment variables from .env file
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
+
+
+class Config:
+    """
+    Centralized configuration class.
+    All configuration values are loaded from environment variables.
+    """
+    
+    # ===================================
+    # BINANCE API CONFIGURATION
+    # ===================================
+    BINANCE_TESTNET_API_KEY = os.getenv('BINANCE_TESTNET_API_KEY', '')
+    BINANCE_TESTNET_API_SECRET = os.getenv('BINANCE_TESTNET_API_SECRET', '')
+    BINANCE_API_KEY = os.getenv('BINANCE_API_KEY', '')
     BINANCE_API_SECRET = os.getenv('BINANCE_API_SECRET', '')
     
     # Exchange settings
@@ -170,6 +197,11 @@
         'ETHUSDT': 2.0,  # Medium volatility
         'SOLUSDT': 2.5   # High volatility
     }
+    
+    # WEB DASHBOARD
+    ENABLE_DASHBOARD = os.getenv('ENABLE_DASHBOARD', 'true').lower() == 'true'
+    DASHBOARD_HOST = os.getenv('DASHBOARD_HOST', '0.0.0.0')
+    DASHBOARD_PORT = int(os.getenv('DASHBOARD_PORT', '5000'))
     
     # ===================================
     # DIRECTORIES
