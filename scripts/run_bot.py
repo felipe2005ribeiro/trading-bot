@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to run the trading bot.
+Script to run the trading bot with integrated dashboard.
 """
 
 import sys
@@ -27,6 +27,33 @@ def main():
         # Create and start bot
         logger.info("Creating trading bot instance...")
         bot = TradingBot()
+        
+        # Start dashboard server in separate thread (if enabled)
+        dashboard_thread = None
+        if Config.ENABLE_DASHBOARD:
+            try:
+                from dashboard.server import DashboardServer
+                import threading
+                
+                logger.info("Starting dashboard server...")
+                dashboard = DashboardServer(bot_instance=bot)
+                
+                def run_dashboard():
+                    """Run dashboard in separate thread."""
+                    dashboard.app.run(
+                        host=Config.DASHBOARD_HOST,
+                        port=Config.DASHBOARD_PORT,
+                        debug=False,
+                        use_reloader=False
+                    )
+                
+                dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
+                dashboard_thread.start()
+                logger.info(f"Dashboard available at http://{Config.DASHBOARD_HOST}:{Config.DASHBOARD_PORT}")
+                
+            except Exception as e:
+                logger.warning(f"Dashboard failed to start: {e}")
+                logger.info("Bot will continue without dashboard")
         
         logger.info("Starting trading bot...")
         bot.start()

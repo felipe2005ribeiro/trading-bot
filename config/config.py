@@ -127,22 +127,6 @@ class Config:
     
     # ===================================
     # TELEGRAM NOTIFICATIONS
-    # ===================================
-    TELEGRAM_ENABLED = os.getenv('TELEGRAM_ENABLED', 'false').lower() == 'true'
-    TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
-    TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', '')
-    
-    # ===================================
-    # SYMBOL-SPECIFIC STRATEGY CONFIGURATION
-    # ===================================
-    # Each symbol uses its optimal strategy based on 180-day REAL data analysis (production)
-    # BTC: SMA_CROSS (+4.20%), ETH: EMA_SCALP (+10.58%), SOL: EMA_SCALP (+3.59%)
-    # NOTE: Previous testnet data (18 days) gave incorrect results - this is validated
-    # ONLY validated symbols included - BNB/ADA/DOT removed until validated
-    SYMBOL_STRATEGIES = {
-        'BTCUSDT': 'SMA_CROSS',   # Real data validated: +4.20% vs EMA_SCALP +1.07%
-        'ETHUSDT': 'EMA_SCALP',   # Real data validated: +10.58% vs RSI_BB -33.60%
-        'SOLUSDT': 'EMA_SCALP',   # Real data validated: +3.59% vs others negative
     }
     
     # Fallback strategy for symbols not in mapping
