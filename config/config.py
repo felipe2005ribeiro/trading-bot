@@ -85,6 +85,24 @@ class Config:
     
     
     # ===================================
+    # BACKTESTING CONFIGURATION
+    # ===================================
+    COMMISSION_RATE = float(os.getenv('COMMISSION_RATE', '0.1'))
+    SLIPPAGE_RATE = float(os.getenv('SLIPPAGE_RATE', '0.05'))
+    
+    # ===================================
+    # LOGGING
+    # ===================================
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    LOG_TO_FILE = os.getenv('LOG_TO_FILE', 'true').lower() == 'true'
+    LOG_TO_CONSOLE = os.getenv('LOG_TO_CONSOLE', 'true').lower() == 'true'
+    
+    # ===================================
+    # SCALPING CONFIGURATION
+    # ===================================
+    ENABLE_SCALPING = os.getenv('ENABLE_SCALPING', 'false').lower() == 'true'
+    SCALPING_TIMEFRAMES = os.getenv('SCALPING_TIMEFRAMES', '5m,15m').split(',')
+    SCALP_STOP_LOSS_PERCENT = float(os.getenv('SCALP_STOP_LOSS_PERCENT', '0.6'))
     SCALP_TAKE_PROFIT_PERCENT = float(os.getenv('SCALP_TAKE_PROFIT_PERCENT', '1.0'))
     
     # EMA Scalping
@@ -176,17 +194,6 @@ class Config:
     # Symbol-specific ATR multipliers
     ATR_MULTIPLIERS = {
         'BTCUSDT': 1.5,  # Less volatile
-        'ETHUSDT': 2.0,  # Medium volatility
-        'SOLUSDT': 2.5   # High volatility
-    }
-    
-    # ===================================
-    # DIRECTORIES
-    # ===================================
-    DATA_DIR = BASE_DIR / 'data'
-    LOGS_DIR = BASE_DIR / 'logs'
-    RESULTS_DIR = BASE_DIR / 'results'
-    
     @classmethod
     def get_api_credentials(cls) -> tuple:
         """
