@@ -280,27 +280,27 @@ python scripts/simulate_trade.py
 
 ## 🌐 Deployment
 
-### Option 1: Railway (Fastest)
-
-1. Sign up at [railway.app](https://railway.app)
-2. Connect GitHub repository
-3. Add environment variables
-4. Deploy!
-
-**Cost:** $0-5/month (Free tier included)
-
-See [railway_deployment_guide.md](docs/railway_deployment_guide.md)
-
-### Option 2: Oracle Cloud (Free Forever)
+### Option 1: Oracle Cloud (Free Forever - Recommended)
 
 1. Create Oracle Cloud account
-2. Launch VM instance
+2. Launch VM instance (ARM recommended - up to 24GB RAM free)
 3. Setup bot with systemd
 4. Configure firewall
 
-**Cost:** $0/month (Always Free tier)
+**Cost:** $0/month (Always Free tier)  
+**Setup:** 45-60 minutes
 
 See [oracle_cloud_deployment_guide.md](docs/oracle_cloud_deployment_guide.md)
+
+### Option 2: DigitalOcean ($4/month)
+
+1. Create Droplet (512MB RAM)
+2. Clone repository
+3. Install dependencies
+4. Setup systemd service
+
+**Cost:** $4/month ($200 credit for new users)  
+**Setup:** 30 minutes
 
 ### Option 3: Docker (Any Platform)
 
@@ -311,6 +311,8 @@ docker build -t trading-bot .
 # Run container
 docker run -d --env-file .env -p 5000:5000 trading-bot
 ```
+
+**Note:** For production trading, Oracle Cloud is recommended as it's free forever and Binance doesn't block its IPs.
 
 ---
 
